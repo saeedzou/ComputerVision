@@ -1,17 +1,12 @@
-# %%
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from utils import *
 
-# %%
-x_train, y_train, x_test, y_test, classes = load_dataset("./happy_cnn/datasets/train_happy.h5",
-                                                         "./happy_cnn/datasets/test_happy.h5")
+x_train, y_train, x_test, y_test, classes = load_dataset("./datasets/train_happy.h5",
+                                                         "./datasets/test_happy.h5")
 x_train, x_test = x_train / 255., x_test / 255.
 y_train, y_test = y_train.T.squeeze(), y_test.T.squeeze()
-
-
-# %%
 
 
 def happy_model(input_shape):
@@ -26,35 +21,22 @@ def happy_model(input_shape):
     return tf.keras.models.Model(i, x)
 
 
-# %%
-
 model = happy_model((64, 64, 3))
 model.compile(optimizer=tf.keras.optimizers.Adam(),
               loss=tf.keras.losses.BinaryCrossentropy(),
               metrics=['accuracy'])
-# %%
+
 r = model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=40, batch_size=16)
-# %%
+
 print(model.summary())
-# %%
-plt.plot(r.history['loss'], label='train_loss')
-plt.plot(r.history['val_loss'], label='val_loss')
-plt.legend()
-plt.show()
-# %%
-plt.plot(r.history['accuracy'], label='train_accuracy')
-plt.plot(r.history['val_accuracy'], label='val_accuracy')
-plt.legend()
-plt.show()
-# %%
-img_path = 'happy_cnn/3.jpg'
+# Plot training and validation loss and accuracy plots
+plot_loss_accuracy_vs_epoch(r, './happy_cnn/loss_acc_plot.png')
+# Test with arbitrary image
+img_path = './2.jpg'  # change this to your image path
 img = tf.keras.utils.load_img(img_path, target_size=(64, 64))
 plt.imshow(img)
-
-x = tf.keras.utils.img_to_array(img)
-x = np.expand_dims(x, axis=0)
-# x = preprocess_input(x)
-plt.title('Happy' if model.predict(x)[0, 0] == 1 else "Sad")
+d = tf.keras.utils.img_to_array(img)
+d = np.expand_dims(d, axis=0)
+plt.title('Happy' if model.predict(d)[0, 0] == 1 else "Sad")
 plt.show()
-print(model.predict(x))
-# %%
+print(model.predict(d))

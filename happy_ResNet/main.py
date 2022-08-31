@@ -1,15 +1,12 @@
-# %%
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from utils import *
 
 
-# %%
-
 def identity_block(x, filters, kernels, strides, conv_modes, training=True):
     """
-
+    Identity block in Course 4 Week 2 of Deep Learning Specialization by Andrew NG.
     Args:
         x: output of previous activation of shape (m, n_H_prev, n_W_prev, n_C_prev)
         filters: a list of number of filters for Conv2d layers (the shape of the following
@@ -20,7 +17,7 @@ def identity_block(x, filters, kernels, strides, conv_modes, training=True):
         training:
 
     Returns:
-        identity block in Course 4 Week 2 of Deep Learning Specialization by Andrew NG.
+        keras layer
     """
     x_shortcut = x
     L = len(filters)
@@ -37,7 +34,7 @@ def identity_block(x, filters, kernels, strides, conv_modes, training=True):
 
 def convolutional_block(x, filters, kernels, strides, conv_modes, training=True):
     """
-
+    Convolutional block in Course 4 Week 2 of Deep Learning Specialization by Andrew NG.
     Args:
         x: output of previous activation of shape (m, n_H_prev, n_W_prev, n_C_prev)
         filters: a list of number of filters for Conv2d layers (the shape of the following
@@ -49,7 +46,7 @@ def convolutional_block(x, filters, kernels, strides, conv_modes, training=True)
         training:
 
     Returns:
-        convolutional block in Course 4 Week 2 of Deep Learning Specialization by Andrew NG.
+        keras layer
     """
     x_shortcut = tf.keras.layers.Conv2D(filters[0], kernels[0], strides[0], padding=conv_modes[0])(x)
     x_shortcut = tf.keras.layers.BatchNormalization(axis=3)(x_shortcut, training=training)
@@ -65,9 +62,6 @@ def convolutional_block(x, filters, kernels, strides, conv_modes, training=True)
     return x
 
 
-# %%
-
-
 def ResNet50(input_shape, output_shape):
     """
     Stage-wise implementation of the architecture of the popular ResNet50:
@@ -78,7 +72,7 @@ def ResNet50(input_shape, output_shape):
         output_shape: integer, number of classes
 
     Returns:
-
+        keras model
     """
     x_in = tf.keras.layers.Input(shape=input_shape)
     x = tf.keras.layers.ZeroPadding2D((3, 3))(x_in)
@@ -147,24 +141,27 @@ def ResNet50(input_shape, output_shape):
     return model
 
 
-# %%
 clf = ResNet50((64, 64, 3), 6)
-#%%
+clf.compile(optimizer=tf.keras.optimizers.Adam(),
+            loss=tf.keras.losses.CategoricalCrossentropy(),
+            metrics=['accuracy'])
 print(clf.summary())
-#%%
-x_train, y_train, x_test, y_test, classes = load_dataset("./sign_cnn/datasets/train_signs.h5",
-                                                         "./sign_cnn/datasets/test_signs.h5")
-x_train, x_test = x_train/255., x_test/255.
+
+# Data preparation and loading
+x_train, y_train, x_test, y_test, _ = load_dataset("./datasets/train_signs.h5",
+                                                   "./datasets/test_signs.h5")
+x_train, x_test = x_train / 255., x_test / 255.
 y_train = tf.one_hot(y_train.T.squeeze(), depth=6).numpy()
 y_test = tf.one_hot(y_test.T.squeeze(), depth=6).numpy()
-#%%
-model.compile(optimizer=tf.keras.optimizers.Adam(),
-              loss=tf.keras.losses.CategoricalCrossentropy(),
-              metrics=['accuracy'])
-#%%
-r = model.fit(x_train, y_train, epochs=10, batch_size=32, validation_data=(x_test, y_test))
-#%%
-img_path = 'sign_cnn/2.jpg'   # change this to your image path
+
+# Training model for 20 epochs
+r = clf.fit(x_train, y_train, epochs=20, batch_size=32, validation_data=(x_test, y_test))
+
+# Plot training and validation loss and accuracy plots
+plot_loss_accuracy_vs_epoch(r, './happy_ResNet/loss_acc_plot.png')
+
+# Test with arbitrary image
+img_path = './2.jpg'  # change this to your image path
 img = tf.keras.utils.load_img(img_path, target_size=(64, 64))
 plt.imshow(img)
 
