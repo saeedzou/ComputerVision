@@ -17,7 +17,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(),
 
 r = model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=15)
 
-# Plot training and validation loss and accuracy plotss
+# Plot training and validation loss and accuracy plots
 plot_loss_accuracy_vs_epoch(r, './sign_cnn/loss_acc_plot.png')
 # Test with arbitrary image
 img_path = './2.jpg'  # change this to your image path
