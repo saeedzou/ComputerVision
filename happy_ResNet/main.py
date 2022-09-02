@@ -160,14 +160,14 @@ r = clf.fit(x_train, y_train, epochs=20, batch_size=32, validation_data=(x_test,
 # Plot training and validation loss and accuracy plots
 plot_loss_accuracy_vs_epoch(r, './happy_ResNet/loss_acc_plot.png')
 
-# Test with arbitrary image
-img_path = './2.jpg'  # change this to your image path
-img = tf.keras.utils.load_img(img_path, target_size=(64, 64))
-plt.imshow(img)
-
-d = tf.keras.utils.img_to_array(img)
-d = np.expand_dims(d, axis=0)
-d = tf.keras.applications.resnet50.preprocess_input(d)
-plt.title(f'Predicted: {np.argmax(model.predict(d)[0])}')
-plt.show()
-print(model.predict(d)[0])
+# Test with arbitrary image (Uncomment the following lines)
+# img_path = './2.jpg'  # change this to your image path
+# img = tf.keras.utils.load_img(img_path, target_size=(64, 64))
+# plt.imshow(img)
+#
+# d = tf.keras.utils.img_to_array(img)
+# d = np.expand_dims(d, axis=0)
+# d = tf.keras.applications.resnet50.preprocess_input(d)
+# plt.title(f'Predicted: {np.argmax(clf.predict(d)[0])}')
+# plt.show()
+# print(clf.predict(d)[0])
